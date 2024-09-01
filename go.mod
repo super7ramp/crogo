@@ -1,6 +1,6 @@
 module crogo
 
-go 1.22
+go 1.23
 
 require (
 	github.com/booleworks/logicng-go v0.4.0
