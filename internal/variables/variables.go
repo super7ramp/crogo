@@ -41,12 +41,25 @@ func (v *Variables) RepresentingCell(row, column, value int) int {
 		1 // variable must be strictly positive
 }
 
+// RepresentingCells returns all the variables associated to the cells of the grid.
+func (v *Variables) RepresentingCells() []uint {
+	variables := make([]uint, v.RepresentingCellCount())
+	for rowIndex := 0; rowIndex < v.grid.RowCount(); rowIndex++ {
+		for columnIndex := 0; columnIndex < v.grid.ColumnCount(); columnIndex++ {
+			for value := 0; value < CellValueCount(); value++ {
+				variables = append(variables, uint(v.RepresentingCell(rowIndex, columnIndex, value)))
+			}
+		}
+	}
+	return variables
+}
+
 // RepresentingSlot returns the variable associated to the given word at the given slot.
 //
 // RepresentingSlot variables are put after cell variables, so first slot variable corresponds to the number of cell variables
 // plus 1 (because variables start at 1).
 func (v *Variables) RepresentingSlot(slotIndex, wordIndex int) int {
-	return v.CellCount() + // last cell variable
+	return v.RepresentingCellCount() + // last cell variable
 		slotIndex*v.wordCount +
 		wordIndex +
 		1
@@ -68,6 +81,7 @@ func (v *Variables) BackToDomain(model []bool) [][]rune {
 					} else {
 						outputGrid[rowIndex][columnIndex] = alphabet.LetterAt(value)
 					}
+					break
 				}
 			}
 		}
@@ -75,17 +89,17 @@ func (v *Variables) BackToDomain(model []bool) [][]rune {
 	return outputGrid
 }
 
-// CellCount returns the number of cell variables.
-func (v *Variables) CellCount() int {
+// RepresentingCellCount returns the number of variables representing cells.
+func (v *Variables) RepresentingCellCount() int {
 	return v.grid.ColumnCount() * v.grid.RowCount() * CellValueCount()
 }
 
-// SlotCount returns the number of slot variables.
-func (v *Variables) SlotCount() int {
+// RepresentingSlotCount returns the number of variables representing slots.
+func (v *Variables) RepresentingSlotCount() int {
 	return v.grid.SlotCount() * v.wordCount
 }
 
 // Count returns the number of variables.
 func (v *Variables) Count() int {
-	return v.CellCount() + v.SlotCount()
+	return v.RepresentingCellCount() + v.RepresentingSlotCount()
 }

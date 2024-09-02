@@ -26,9 +26,10 @@ func TestNewCrossword_Error(t *testing.T) {
 	assert.EqualError(t, err, "invalid value at row #0, column #0: _")
 }
 
-func TestNewCrossword_SolveUnsat(t *testing.T) {
-	words := []string{"ABC", "DEF", "AA", "BB", "CC"}
+func TestSolve_Unsat(t *testing.T) {
+	words := []string{"AAA", "BBB", "CDF" /* should be CDE */, "ABC", "ABD", "ABE"}
 	cells := [][]rune{
+		{'.', '.', '.'},
 		{'.', '.', '.'},
 		{'.', '.', '.'},
 	}
@@ -40,7 +41,7 @@ func TestNewCrossword_SolveUnsat(t *testing.T) {
 	}
 }
 
-func TestNewCrossword_Solve(t *testing.T) {
+func TestSolve_Sat(t *testing.T) {
 	words := []string{"AAA", "BBB", "CDE", "ABC", "ABD", "ABE"}
 	grid := [][]rune{
 		{'.', '.', '.'},
@@ -84,5 +85,5 @@ func assertSolutionsEqual(t *testing.T, expected [][][]rune, actual iter.Seq[[][
 		})
 		require.NotEqualf(t, oldLen, len(expected), "Unexpected solution %v", actualSolution)
 	}
-	require.Equalf(t, [][][]rune{}, expected, "Missing solutions %#U", expected)
+	require.Equalf(t, [][][]rune{}, expected, "Missing solutions %v", expected)
 }

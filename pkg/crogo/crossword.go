@@ -45,7 +45,7 @@ func (c *Crossword) SolveWith(configurableSolver solver.ConfigurableSolver) Solu
 // addClausesTo adds clauses to the given solver configurer.
 func (c *Crossword) addClausesTo(solverConfigurer solver.Configurer) {
 	solverConfigurer.AllocateVariables(uint(c.variables.Count()))
-	// TODO solverConfigurer.SetRelevantVariables(c.variables.Cells())
+	solverConfigurer.SetRelevantVariables(c.variables.RepresentingCells())
 	c.constraints.AddOneLetterOrBlockPerCellClausesTo(solverConfigurer)
 	c.constraints.AddOneWordPerSlotClausesTo(solverConfigurer)
 	c.constraints.AddInputGridConstraintsAreSatisfiedClausesTo(solverConfigurer)

@@ -50,7 +50,7 @@ func TestRepresentingCellCount(t *testing.T) {
 		{'.', '.', '.'},
 	})
 	variables := NewVariables(grid, 100_000 /* does not matter here */)
-	assert.Equal(t, 243, variables.CellCount())
+	assert.Equal(t, 243, variables.RepresentingCellCount())
 }
 
 func TestRepresentingSlotCount(t *testing.T) {
@@ -60,7 +60,7 @@ func TestRepresentingSlotCount(t *testing.T) {
 		{'.', '.', '.'},
 	})
 	variables := NewVariables(grid, 100_000)
-	assert.Equal(t, 600_000, variables.SlotCount())
+	assert.Equal(t, 600_000, variables.RepresentingSlotCount())
 }
 
 func TestCount(t *testing.T) {

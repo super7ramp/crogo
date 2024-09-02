@@ -10,7 +10,8 @@ import (
 
 type logicNgSolver struct {
 	*spi.BaseConfigurer
-	satSolver *sat.Solver
+	satSolver         *sat.Solver
+	relevantVariables []formula.Variable
 }
 
 // NewLogicNgSolver creates a new instance of a spi.ConfigurableSolver based on Gophersat.
@@ -23,7 +24,14 @@ func NewLogicNgSolver() spi.ConfigurableSolver {
 	return &solverConfigurer
 }
 
-func (l logicNgSolver) AddClause(spiLiterals []spi.Literal) {
+func (l *logicNgSolver) SetRelevantVariables(variables []spi.Variable) {
+	l.relevantVariables = make([]formula.Variable, len(variables))
+	for i, variable := range variables {
+		l.relevantVariables[i] = l.satSolver.Factory().Var(strconv.FormatUint(uint64(variable), 10))
+	}
+}
+
+func (l *logicNgSolver) AddClause(spiLiterals []spi.Literal) {
 	formulaFactory := l.satSolver.Factory()
 	literals := make([]formula.Literal, len(spiLiterals))
 	for i, spiLiteral := range spiLiterals {
@@ -35,12 +43,17 @@ func (l logicNgSolver) AddClause(spiLiterals []spi.Literal) {
 
 // TODO override addExactlyOneClause with PB clause
 
-func (l logicNgSolver) Solutions() iter.Seq[spi.Model] {
+func (l *logicNgSolver) Solutions() iter.Seq[spi.Model] {
 	return func(yield func(spi.Model) bool) {
 		// TODO actually enumerate all solutions
-		if l.satSolver.Sat() {
-			model := l.satSolver.CoreSolver().Model()
-			yield(model)
+		result := l.satSolver.Call(sat.WithModel(l.relevantVariables))
+		if result.OK() && result.Sat() {
+			model := result.Model().Literals
+			adaptedModel := make([]bool, len(model))
+			for i, lit := range model {
+				adaptedModel[i] = lit > 0
+			}
+			yield(adaptedModel)
 		}
 	}
 }
