@@ -5,7 +5,6 @@ import (
 	"github.com/booleworks/logicng-go/formula"
 	"github.com/booleworks/logicng-go/sat"
 	"iter"
-	"strconv"
 )
 
 type logicNgSolver struct {
@@ -26,19 +25,26 @@ func NewLogicNgSolver() spi.ConfigurableSolver {
 
 func (l *logicNgSolver) SetRelevantVariables(variables []spi.Variable) {
 	l.relevantVariables = make([]formula.Variable, len(variables))
+	formulaFactory := l.satSolver.Factory()
 	for i, variable := range variables {
-		l.relevantVariables[i] = l.satSolver.Factory().Var(strconv.FormatUint(uint64(variable), 10))
+		l.relevantVariables[i] = formulaFactory.Var(variable.String())
 	}
 }
 
 func (l *logicNgSolver) AddClause(spiLiterals []spi.Literal) {
+	literals := l.logicNgLitsFrom(spiLiterals)
+	clause := l.satSolver.Factory().Clause(literals...)
+	l.satSolver.Add(clause)
+}
+
+func (l *logicNgSolver) logicNgLitsFrom(spiLiterals []spi.Literal) []formula.Literal {
 	formulaFactory := l.satSolver.Factory()
 	literals := make([]formula.Literal, len(spiLiterals))
 	for i, spiLiteral := range spiLiterals {
-		literals[i] = formulaFactory.Lit(strconv.Itoa(spiLiteral), spiLiteral > 0)
+		spiVariable := spi.VariableFrom(spiLiteral)
+		literals[i] = formulaFactory.Lit(spiVariable.String(), spiLiteral > 0)
 	}
-	clause := formulaFactory.Clause(literals...)
-	l.satSolver.Add(clause)
+	return literals
 }
 
 // TODO override addExactlyOneClause with PB clause
@@ -46,7 +52,9 @@ func (l *logicNgSolver) AddClause(spiLiterals []spi.Literal) {
 func (l *logicNgSolver) Solutions() iter.Seq[spi.Model] {
 	return func(yield func(spi.Model) bool) {
 		// TODO actually enumerate all solutions
-		result := l.satSolver.Call(sat.WithModel(l.relevantVariables))
+		result := l.satSolver.Call(
+			sat.WithModel(l.relevantVariables),
+		)
 		if result.OK() && result.Sat() {
 			model := result.Model().Literals
 			adaptedModel := make([]bool, len(model))

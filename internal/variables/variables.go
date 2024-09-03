@@ -11,6 +11,7 @@ package variables
 import (
 	"crogo/internal/alphabet"
 	"crogo/internal/grid"
+	"crogo/pkg/solver"
 )
 
 type Variables struct {
@@ -34,20 +35,21 @@ func BlockIndex() int {
 }
 
 // RepresentingCell returns the variable associated to the given cell and value.
-func (v *Variables) RepresentingCell(row, column, value int) int {
-	return row*v.grid.ColumnCount()*CellValueCount() +
+func (v *Variables) RepresentingCell(row, column, value int) solver.Variable {
+	return solver.Variable(row*v.grid.ColumnCount()*CellValueCount() +
 		column*CellValueCount() +
 		value +
-		1 // variable must be strictly positive
+		1) // variable must be strictly positive
 }
 
 // RepresentingCells returns all the variables associated to the cells of the grid.
-func (v *Variables) RepresentingCells() []uint {
-	variables := make([]uint, v.RepresentingCellCount())
+func (v *Variables) RepresentingCells() []solver.Variable {
+	variables := make([]solver.Variable, 0, v.RepresentingCellCount())
 	for rowIndex := 0; rowIndex < v.grid.RowCount(); rowIndex++ {
 		for columnIndex := 0; columnIndex < v.grid.ColumnCount(); columnIndex++ {
 			for value := 0; value < CellValueCount(); value++ {
-				variables = append(variables, uint(v.RepresentingCell(rowIndex, columnIndex, value)))
+				variable := v.RepresentingCell(rowIndex, columnIndex, value)
+				variables = append(variables, variable)
 			}
 		}
 	}
@@ -58,11 +60,11 @@ func (v *Variables) RepresentingCells() []uint {
 //
 // RepresentingSlot variables are put after cell variables, so first slot variable corresponds to the number of cell variables
 // plus 1 (because variables start at 1).
-func (v *Variables) RepresentingSlot(slotIndex, wordIndex int) int {
-	return v.RepresentingCellCount() + // last cell variable
+func (v *Variables) RepresentingSlot(slotIndex, wordIndex int) solver.Variable {
+	return solver.Variable(v.RepresentingCellCount() + // last cell variable
 		slotIndex*v.wordCount +
 		wordIndex +
-		1
+		1)
 }
 
 // BackToDomain translates the variables states back to a crossword grid.

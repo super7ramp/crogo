@@ -22,15 +22,15 @@ func NewGophersatSolver() spi.ConfigurableSolver {
 }
 
 // AddClause adds the given literals as an *at-least-one* clause, i.e. a disjunction (= or).
-func (s *gophersatSolver) AddClause(literals []spi.Literal) {
-	literalsCopy := intsToLits(literals...)
-	clause := sat.NewClause(literalsCopy)
+func (s *gophersatSolver) AddClause(spiLiterals []spi.Literal) {
+	literals := gophersatLitsFrom(spiLiterals...)
+	clause := sat.NewClause(literals)
 	s.satSolver.AppendClause(clause)
 }
 
 // TODO override addExactlyOneClause with PB clause
 
-func intsToLits(vals ...int) []sat.Lit {
+func gophersatLitsFrom(vals ...spi.Literal) []sat.Lit {
 	// That's a useless copy...
 	res := make([]sat.Lit, len(vals))
 	for i, val := range vals {

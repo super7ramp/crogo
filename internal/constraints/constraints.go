@@ -44,11 +44,11 @@ func (c *Constraints) AddOneLetterOrBlockPerCellClausesTo(solverConfigurer solve
 	for row := 0; row < c.grid.RowCount(); row++ {
 		for column := 0; column < c.grid.ColumnCount(); column++ {
 			for letterIndex := 0; letterIndex < alphabet.LetterCount(); letterIndex++ {
-				letterVariable := c.variables.RepresentingCell(row, column, letterIndex)
-				literalsBuffer = append(literalsBuffer, letterVariable)
+				letterLiteral := solver.Literal(c.variables.RepresentingCell(row, column, letterIndex))
+				literalsBuffer = append(literalsBuffer, letterLiteral)
 			}
-			blockVariable := c.variables.RepresentingCell(row, column, BlockIndex())
-			literalsBuffer = append(literalsBuffer, blockVariable)
+			blockLiteral := solver.Literal(c.variables.RepresentingCell(row, column, BlockIndex()))
+			literalsBuffer = append(literalsBuffer, blockLiteral)
 			solverConfigurer.AddExactlyOne(literalsBuffer)
 			literalsBuffer = literalsBuffer[:0]
 		}
@@ -63,9 +63,9 @@ func (c *Constraints) AddOneWordPerSlotClausesTo(solverConfigurer solver.Configu
 	for slotIndex, slot := range c.grid.Slots() {
 		for wordIndex, word := range c.words {
 			if len(word) == slot.Length() {
-				slotLiteral := c.variables.RepresentingSlot(slotIndex, wordIndex)
+				slotLiteral := solver.Literal(c.variables.RepresentingSlot(slotIndex, wordIndex))
 				slotLiteralsBuffer = append(slotLiteralsBuffer, slotLiteral)
-				c.fillCellLiteralsConjunction(cellLiteralsBuffer, slot, word)
+				c.fillCellLiteralsConjunction(&cellLiteralsBuffer, slot, word)
 				solverConfigurer.AddAnd(slotLiteral, cellLiteralsBuffer)
 				cellLiteralsBuffer = cellLiteralsBuffer[:0]
 			} // else skip this word since it obviously doesn't match the slot
@@ -75,11 +75,11 @@ func (c *Constraints) AddOneWordPerSlotClausesTo(solverConfigurer solver.Configu
 	}
 }
 
-// Fills the given vector with the cell literals whose conjunction (= and) is equivalent to the
-// slot variable of the given slot and word.
+// fillCellLiteralsConjunction fills the given slice with the cell literals whose conjunction (= and) is equivalent to
+// the slot variable of the given slot and word.
 //
 // Panics if the given word contains a letter which is not in the [alphabet].
-func (c *Constraints) fillCellLiteralsConjunction(cellLiterals []solver.Literal, slot Slot, word string) {
+func (c *Constraints) fillCellLiteralsConjunction(cellLiterals *[]solver.Literal, slot Slot, word string) {
 	slotPositions := slot.Positions()
 	wordRunes := []rune(word)
 	for i := 0; i < len(slotPositions); i++ {
@@ -88,8 +88,8 @@ func (c *Constraints) fillCellLiteralsConjunction(cellLiterals []solver.Literal,
 			panic("Unsupported character " + string(wordRunes[i]))
 		}
 		slotPos := slotPositions[i]
-		cellVar := c.variables.RepresentingCell(slotPos.Row(), slotPos.Column(), letterIndex)
-		cellLiterals = append(cellLiterals, cellVar)
+		cellLiteral := solver.Literal(c.variables.RepresentingCell(slotPos.Row(), slotPos.Column(), letterIndex))
+		*cellLiterals = append(*cellLiterals, cellLiteral)
 	}
 }
 
@@ -102,12 +102,12 @@ func (c *Constraints) AddInputGridConstraintsAreSatisfiedClausesTo(solverConfigu
 			var literal solver.Literal
 			if prefilledLetter == CellEmpty {
 				// Disallow solver to create a block
-				literal = -c.variables.RepresentingCell(row, column, BlockIndex())
+				literal = solver.Literal(c.variables.RepresentingCell(row, column, BlockIndex())).Negated()
 			} else if prefilledLetter == CellBlock {
-				literal = c.variables.RepresentingCell(row, column, BlockIndex())
+				literal = solver.Literal(c.variables.RepresentingCell(row, column, BlockIndex()))
 			} else {
 				letterIndex, _ := alphabet.IndexOf(prefilledLetter)
-				literal = c.variables.RepresentingCell(row, column, letterIndex)
+				literal = solver.Literal(c.variables.RepresentingCell(row, column, letterIndex))
 			}
 			solverConfigurer.AddClause([]solver.Literal{literal})
 		}

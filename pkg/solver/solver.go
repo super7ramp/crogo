@@ -1,13 +1,33 @@
 package solver
 
-import "iter"
+import (
+	"iter"
+	"strconv"
+)
 
 // Variable is a variable number. 0 is not a valid variable number, variables start at 1.
-type Variable = uint
+type Variable uint
+
+func (v Variable) String() string {
+	return strconv.FormatUint(uint64(v), 10)
+}
 
 // Literal is an instantiated variable, i.e. it is the variable number if the variable is true, or the negative of the
 // variable number if the variable is false. Since variable number starts at 1, 0 is not a valid literal.
-type Literal = int
+type Literal int
+
+// Negated returns the negated version of the Literal.
+func (l Literal) Negated() Literal {
+	return -l
+}
+
+// VariableFrom returns the Variable associated to the given Literal.
+func VariableFrom(literal Literal) Variable {
+	if literal < 0 {
+		return Variable(-literal)
+	}
+	return Variable(literal)
+}
 
 // Model is a slice of the variable states, indexed by the variable number.
 type Model = []bool
