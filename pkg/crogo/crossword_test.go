@@ -29,7 +29,7 @@ func TestNewCrossword_Error(t *testing.T) {
 func TestSolve_Unsat(t *testing.T) {
 	words := []string{"AAA", "BBB", "CDF" /* should be CDE */, "ABC", "ABD", "ABE"}
 	cells := [][]rune{
-		{'.', '.', '.'},
+		{'A', 'B', 'C'},
 		{'.', '.', '.'},
 		{'.', '.', '.'},
 	}
@@ -78,12 +78,13 @@ func TestSolve_Sat(t *testing.T) {
 }
 
 func assertSolutionsEqual(t *testing.T, expected [][][]rune, actual iter.Seq[[][]rune]) {
+	expectedRemaining := expected
 	for actualSolution := range actual {
-		oldLen := len(expected)
-		slices.DeleteFunc(expected, func(expectedSolution [][]rune) bool {
+		oldLen := len(expectedRemaining)
+		expectedRemaining = slices.DeleteFunc(expectedRemaining, func(expectedSolution [][]rune) bool {
 			return reflect.DeepEqual(actualSolution, expectedSolution)
 		})
-		require.NotEqualf(t, oldLen, len(expected), "Unexpected solution %v", actualSolution)
+		assert.NotEqualf(t, oldLen, len(expectedRemaining), "Unexpected solution %v", actualSolution)
 	}
-	require.Equalf(t, [][][]rune{}, expected, "Missing solutions %v", expected)
+	require.Equalf(t, [][][]rune{}, expectedRemaining, "Missing solutions %v", expectedRemaining)
 }

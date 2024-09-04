@@ -51,17 +51,28 @@ func (l *logicNgSolver) logicNgLitsFrom(spiLiterals []spi.Literal) []formula.Lit
 
 func (l *logicNgSolver) Solutions() iter.Seq[spi.Model] {
 	return func(yield func(spi.Model) bool) {
-		// TODO actually enumerate all solutions
-		result := l.satSolver.Call(
-			sat.WithModel(l.relevantVariables),
-		)
-		if result.OK() && result.Sat() {
+		for {
+			result := l.satSolver.Call(sat.WithModel(l.relevantVariables))
+			if !result.OK() || !result.Sat() {
+				break
+			}
+
 			model := result.Model().Literals
 			adaptedModel := make([]bool, len(model))
 			for i, lit := range model {
-				adaptedModel[i] = lit > 0
+				adaptedModel[i] = lit.IsPos()
 			}
-			yield(adaptedModel)
+			if keepGoing := yield(adaptedModel); !keepGoing {
+				break
+			}
+
+			differentModel := make([]formula.Literal, len(model))
+			factory := l.satSolver.Factory()
+			for i, lit := range model {
+				differentModel[i] = lit.Negate(factory)
+			}
+			differentModelClause := factory.Clause(differentModel...)
+			l.satSolver.Add(differentModelClause)
 		}
 	}
 }
