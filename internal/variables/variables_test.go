@@ -2,6 +2,7 @@ package variables
 
 import (
 	. "crogo/internal/grid"
+	. "crogo/pkg/solver"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -14,15 +15,15 @@ func TestCell(t *testing.T) {
 	})
 	variables := NewVariables(grid, 100_000 /* does not matter here */)
 
-	assert.Equal(t, 1, variables.RepresentingCell(0, 0, 0))
-	assert.Equal(t, 2, variables.RepresentingCell(0, 0, 1))
-	assert.Equal(t, 27, variables.RepresentingCell(0, 0, 26))
+	assert.Equal(t, Variable(1), variables.RepresentingCell(0, 0, 0))
+	assert.Equal(t, Variable(2), variables.RepresentingCell(0, 0, 1))
+	assert.Equal(t, Variable(27), variables.RepresentingCell(0, 0, 26))
 
-	assert.Equal(t, 28, variables.RepresentingCell(0, 1, 0))
-	assert.Equal(t, 29, variables.RepresentingCell(0, 1, 1))
-	assert.Equal(t, 54, variables.RepresentingCell(0, 1, 26))
+	assert.Equal(t, Variable(28), variables.RepresentingCell(0, 1, 0))
+	assert.Equal(t, Variable(29), variables.RepresentingCell(0, 1, 1))
+	assert.Equal(t, Variable(54), variables.RepresentingCell(0, 1, 26))
 
-	assert.Equal(t, 243, variables.RepresentingCell(2, 2, 26))
+	assert.Equal(t, Variable(243), variables.RepresentingCell(2, 2, 26))
 }
 
 func TestRepresentingSlot(t *testing.T) {
@@ -33,14 +34,14 @@ func TestRepresentingSlot(t *testing.T) {
 	})
 	variables := NewVariables(grid, 100_000)
 
-	assert.Equal(t, 244, variables.RepresentingSlot(0, 0))
-	assert.Equal(t, 245, variables.RepresentingSlot(0, 1))
-	assert.Equal(t, 100_243, variables.RepresentingSlot(0, 99_999))
+	assert.Equal(t, Variable(244), variables.RepresentingSlot(0, 0))
+	assert.Equal(t, Variable(245), variables.RepresentingSlot(0, 1))
+	assert.Equal(t, Variable(100_243), variables.RepresentingSlot(0, 99_999))
 
-	assert.Equal(t, 100_244, variables.RepresentingSlot(1, 0))
-	assert.Equal(t, 100_245, variables.RepresentingSlot(1, 1))
+	assert.Equal(t, Variable(100_244), variables.RepresentingSlot(1, 0))
+	assert.Equal(t, Variable(100_245), variables.RepresentingSlot(1, 1))
 
-	assert.Equal(t, 600_243, variables.RepresentingSlot(5, 99_999))
+	assert.Equal(t, Variable(600_243), variables.RepresentingSlot(5, 99_999))
 }
 
 func TestRepresentingCellCount(t *testing.T) {
