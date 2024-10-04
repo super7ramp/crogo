@@ -1,6 +1,7 @@
 package crogo
 
 import (
+	"crogo/pkg/dictionaries"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"iter"
@@ -41,7 +42,7 @@ func TestSolve_Unsat(t *testing.T) {
 	}
 }
 
-func TestSolve_Sat(t *testing.T) {
+func TestSolve_Sat_Simple(t *testing.T) {
 	words := []string{"AAA", "BBB", "CDE", "ABC", "ABD", "ABE"}
 	grid := [][]rune{
 		{'.', '.', '.'},
@@ -77,6 +78,37 @@ func TestSolve_Sat(t *testing.T) {
 	assertSolutionsEqual(t, expectedSolutions, actualSolutions)
 }
 
+func TestSolve_Sat_Complex(t *testing.T) {
+	words := dictionaries.Ukacd()
+	grid := [][]rune{
+		{'.', '.', '.'},
+		{'.', '.', '.'},
+		{'.', '.', '.'},
+	}
+	crossword, _ := NewCrossword(grid, words)
+
+	solutionsIter := crossword.Solve()
+
+	expectedNextSolutions := [][][]rune{
+		{
+			{'B', 'A', 'A'},
+			{'A', 'B', 'B'},
+			{'B', 'A', 'A'},
+		},
+		{
+			{'B', 'A', 'A'},
+			{'A', 'L', 'B'},
+			{'B', 'A', 'A'},
+		},
+		{
+			{'B', 'A', 'A'},
+			{'A', 'L', 'B'},
+			{'B', 'E', 'A'},
+		},
+	}
+	assertNextSolutionsEqual(t, expectedNextSolutions, solutionsIter)
+}
+
 func assertSolutionsEqual(t *testing.T, expected [][][]rune, actual iter.Seq[[][]rune]) {
 	expectedRemaining := expected
 	for actualSolution := range actual {
@@ -87,4 +119,14 @@ func assertSolutionsEqual(t *testing.T, expected [][][]rune, actual iter.Seq[[][
 		assert.NotEqualf(t, oldLen, len(expectedRemaining), "Unexpected solution %v", actualSolution)
 	}
 	require.Equalf(t, [][][]rune{}, expectedRemaining, "Missing solutions %v", expectedRemaining)
+}
+
+func assertNextSolutionsEqual(t *testing.T, someExpected [][][]rune, actualIter iter.Seq[[][]rune]) {
+	getNextActual, stop := iter.Pull(actualIter)
+	defer stop()
+	for _, expected := range someExpected {
+		actual, found := getNextActual()
+		require.True(t, found, "Solution not found: %v", expected)
+		require.True(t, reflect.DeepEqual(expected, actual), "Expected %v, got %v", expected, actual)
+	}
 }
