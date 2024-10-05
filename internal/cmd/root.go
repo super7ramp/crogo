@@ -18,7 +18,7 @@ var count int
 var rootCmd = &cobra.Command{
 	Use:   "crogo <GRID>",
 	Short: "Solve a crossword grid",
-	Long: `🐊 Welcome to Crogo, a crossword solver that bites hard.
+	Long: `🐊 Welcome to Crogo, a crossword solver that bites
 
 Examples:
 
