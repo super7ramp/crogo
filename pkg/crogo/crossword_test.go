@@ -123,8 +123,8 @@ func TestSolve_Sat_Complex(t *testing.T) {
 		},
 		{
 			{'B', 'A', 'A'},
-			{'A', 'L', 'B'},
-			{'B', 'E', 'A'},
+			{'A', 'R', 'B'},
+			{'B', 'A', 'A'},
 		},
 	}
 	assertNextSolutionsEqual(t, expectedNextSolutions, solutionsIter)
