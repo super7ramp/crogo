@@ -14,7 +14,7 @@ type logicNgSolver struct {
 	relevantVariables []formula.Variable
 }
 
-// NewLogicNgSolver creates a new instance of a spi.ConfigurableSolver based on Gophersat.
+// NewLogicNgSolver creates a new instance of a spi.ConfigurableSolver based on LogicNg.
 func NewLogicNgSolver() spi.ConfigurableSolver {
 	formulaFactory := formula.NewFactory()
 	satSolver := sat.NewSolver(formulaFactory)
