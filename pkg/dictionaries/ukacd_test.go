@@ -8,7 +8,15 @@ import (
 
 func TestUkacd_NoAccent(t *testing.T) {
 	for _, word := range Ukacd() {
-		if strings.ContainsAny(word, "ÀÉÈÊËÎÏÔÙÛÜ") {
+		if strings.ContainsAny(word, "ÀÅÄÉÈÊËÎÏÍÔÓÖÙÛÜÑ") {
+			assert.Failf(t, "word %s contains accent", word)
+		}
+	}
+}
+
+func TestUkacd_NoPunctuation(t *testing.T) {
+	for _, word := range Ukacd() {
+		if strings.ContainsAny(word, "!-'.?") {
 			assert.Failf(t, "word %s contains accent", word)
 		}
 	}

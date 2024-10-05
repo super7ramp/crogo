@@ -16,17 +16,25 @@ func Ukacd() []string {
 		"'", "",
 		".", "",
 		" ", "",
+		"?", "",
+		"!", "",
 		"À", "A",
+		"Å", "A",
+		"Ä", "A",
 		"É", "E",
 		"È", "E",
 		"Ê", "E",
 		"Ë", "E",
 		"Î", "I",
 		"Ï", "I",
+		"Í", "I",
 		"Ô", "O",
+		"Ó", "O",
+		"Ö", "O",
 		"Ù", "U",
 		"Û", "U",
-		"Ü", "U")
+		"Ü", "U",
+		"Ñ", "N")
 	for i := range words {
 		words[i] = strings.ToUpper(words[i])
 		words[i] = replacer.Replace(words[i])
