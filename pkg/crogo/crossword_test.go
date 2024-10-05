@@ -37,7 +37,7 @@ func TestSolve_Unsat(t *testing.T) {
 	crossword, _ := NewCrossword(cells, words)
 	solutions := crossword.Solve()
 	for solution := range solutions {
-		t.Logf("Unexpected solution %v", solution)
+		t.Logf("Unexpected solution %c", solution)
 		t.Fail()
 	}
 }
@@ -116,9 +116,9 @@ func assertSolutionsEqual(t *testing.T, expected [][][]rune, actual iter.Seq[[][
 		expectedRemaining = slices.DeleteFunc(expectedRemaining, func(expectedSolution [][]rune) bool {
 			return reflect.DeepEqual(actualSolution, expectedSolution)
 		})
-		assert.NotEqualf(t, oldLen, len(expectedRemaining), "Unexpected solution %v", actualSolution)
+		assert.NotEqualf(t, oldLen, len(expectedRemaining), "Unexpected solution %c", actualSolution)
 	}
-	require.Equalf(t, [][][]rune{}, expectedRemaining, "Missing solutions %v", expectedRemaining)
+	require.Equalf(t, [][][]rune{}, expectedRemaining, "Missing solutions %c", expectedRemaining)
 }
 
 func assertNextSolutionsEqual(t *testing.T, someExpected [][][]rune, actualIter iter.Seq[[][]rune]) {
@@ -126,7 +126,7 @@ func assertNextSolutionsEqual(t *testing.T, someExpected [][][]rune, actualIter 
 	defer stop()
 	for _, expected := range someExpected {
 		actual, found := getNextActual()
-		require.True(t, found, "Solution not found: %v", expected)
-		require.True(t, reflect.DeepEqual(expected, actual), "Expected %v, got %v", expected, actual)
+		require.True(t, found, "Solution not found: %c", expected)
+		require.True(t, reflect.DeepEqual(expected, actual), "Expected %c, got %c", expected, actual)
 	}
 }
