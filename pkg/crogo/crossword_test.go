@@ -112,19 +112,19 @@ func TestSolve_Sat_Complex(t *testing.T) {
 
 	expectedNextSolutions := [][][]rune{
 		{
-			{'B', 'A', 'A'},
-			{'A', 'B', 'B'},
-			{'B', 'A', 'A'},
+			{'F', 'L', 'U'},
+			{'L', 'O', 'G'},
+			{'U', 'G', 'S'},
 		},
 		{
-			{'B', 'A', 'A'},
-			{'A', 'L', 'B'},
-			{'B', 'A', 'A'},
+			{'F', 'L', 'U'},
+			{'E', 'O', 'N'},
+			{'U', 'G', 'S'},
 		},
 		{
-			{'B', 'A', 'A'},
-			{'A', 'R', 'B'},
-			{'B', 'A', 'A'},
+			{'F', 'L', 'O'},
+			{'E', 'O', 'N'},
+			{'U', 'G', 'S'},
 		},
 	}
 	assertNextSolutionsEqual(t, expectedNextSolutions, solutionsIter)

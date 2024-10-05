@@ -5,6 +5,7 @@ import (
 	"github.com/booleworks/logicng-go/formula"
 	"github.com/booleworks/logicng-go/sat"
 	"iter"
+	"slices"
 )
 
 type logicNgSolver struct {
@@ -47,7 +48,11 @@ func (l *logicNgSolver) logicNgLitsFrom(spiLiterals []spi.Literal) []formula.Lit
 	return literals
 }
 
-// TODO override addExactlyOneClause with PB clause
+func (l *logicNgSolver) AddExactlyOne(spiLiterals []spi.Literal) {
+	literals := l.logicNgLitsFrom(spiLiterals)
+	clause := l.satSolver.Factory().PBC(formula.EQ, 1, literals, slices.Repeat([]int{1}, len(literals)))
+	l.satSolver.Add(clause)
+}
 
 func (l *logicNgSolver) Solutions() iter.Seq[spi.Model] {
 	return func(yield func(spi.Model) bool) {
