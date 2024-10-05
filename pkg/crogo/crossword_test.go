@@ -78,6 +78,27 @@ func TestSolve_Sat_Simple(t *testing.T) {
 	assertSolutionsEqual(t, expectedSolutions, actualSolutions)
 }
 
+func TestSolve_Sat_Simple_Prefilled(t *testing.T) {
+	words := []string{"AAA", "BBB", "CDE", "ABC", "ABD", "ABE"}
+	grid := [][]rune{
+		{'A', '.', '.'},
+		{'B', '.', '.'},
+		{'.', '.', '.'},
+	}
+	crossword, _ := NewCrossword(grid, words)
+
+	actualSolutions := crossword.Solve()
+
+	expectedSolutions := [][][]rune{
+		{
+			{'A', 'A', 'A'},
+			{'B', 'B', 'B'},
+			{'C', 'D', 'E'},
+		},
+	}
+	assertSolutionsEqual(t, expectedSolutions, actualSolutions)
+}
+
 func TestSolve_Sat_Complex(t *testing.T) {
 	words := dictionaries.Ukacd()
 	grid := [][]rune{
