@@ -34,6 +34,7 @@ Usage:
   crogo <GRID> [flags]
 
 Flags:
-  -c, --count int   The desired number of solutions (default 1)
-  -h, --help        help for crogo
+  -c, --count int       the desired number of solutions (default 1)
+  -h, --help            help for crogo
+  -s, --solver string   the desired solver backend. Possible values are: logicng, gini (default "logicng")
 ```
