@@ -31,6 +31,7 @@ func NewCrossword(cells [][]rune, words []string) (*Crossword, error) {
 
 // Solve solves this crossword using builtin solver.
 func (c *Crossword) Solve() Solutions {
+	//defaultSolver := NewGiniSolver()
 	//defaultSolver := NewGophersatSolver()
 	defaultSolver := NewLogicNgSolver()
 	return c.SolveWith(defaultSolver)

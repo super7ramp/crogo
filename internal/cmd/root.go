@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"crogo/internal/solver"
 	"crogo/pkg/crogo"
 	"crogo/pkg/dictionaries"
+	spi "crogo/pkg/solver"
+	"errors"
 	"fmt"
 	"iter"
 	"os"
@@ -13,6 +16,9 @@ import (
 
 // count is the desired number of solutions.
 var count int
+
+// solverName is the name of the desired solver.
+var solverName string
 
 // rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
@@ -48,15 +54,18 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().IntVarP(&count, "count", "c", 1, "The desired number of solutions")
+	rootCmd.Flags().IntVarP(&count, "count", "c", 1, "the desired number of solutions")
+	rootCmd.Flags().StringVarP(&solverName, "solver", "s", "logicng", "the desired solver backend. Possible values are: logicng, gini")
 }
 
 func run(_ *cobra.Command, args []string) error {
-	crossword, err := crosswordFrom(args[0])
-	if err != nil {
-		return err
+	crossword, errCrossword := crosswordFrom(args[0])
+	s, errSolver := solverFrom(solverName)
+	if errCrossword != nil || errSolver != nil {
+		return errors.Join(errCrossword, errSolver)
 	}
-	solveAndPrintSolutionsOf(crossword)
+	solutions := crossword.SolveWith(s)
+	iterateAndPrint(solutions)
 	return nil
 }
 
@@ -69,8 +78,18 @@ func crosswordFrom(crosswordArg string) (*crogo.Crossword, error) {
 	return crogo.NewCrossword(runes, dictionaries.Ukacd())
 }
 
-func solveAndPrintSolutionsOf(crossword *crogo.Crossword) {
-	solutions := crossword.Solve()
+func solverFrom(solverName string) (spi.ConfigurableSolver, error) {
+	switch solverName {
+	case "logicng":
+		return solver.NewLogicNgSolver(), nil
+	case "gini":
+		return solver.NewGiniSolver(), nil
+	default:
+		return nil, fmt.Errorf("unknown solver: %s", solverName)
+	}
+}
+
+func iterateAndPrint(solutions crogo.Solutions) {
 	getNextSolution, stop := iter.Pull(solutions)
 	defer stop()
 	for i := 1; i <= count; i++ {
