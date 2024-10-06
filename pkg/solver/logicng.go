@@ -1,7 +1,6 @@
 package solver
 
 import (
-	spi "crogo/pkg/solver"
 	"github.com/booleworks/logicng-go/formula"
 	"github.com/booleworks/logicng-go/sat"
 	"iter"
@@ -9,22 +8,22 @@ import (
 )
 
 type logicNgSolver struct {
-	*spi.BaseConfigurer
+	*BaseConfigurer
 	satSolver         *sat.Solver
 	relevantVariables []formula.Variable
 }
 
 // NewLogicNgSolver creates a new instance of a spi.ConfigurableSolver based on LogicNg.
-func NewLogicNgSolver() spi.ConfigurableSolver {
+func NewLogicNgSolver() ConfigurableSolver {
 	formulaFactory := formula.NewFactory()
 	satSolver := sat.NewSolver(formulaFactory)
-	baseConfigurer := spi.BaseConfigurer{}
+	baseConfigurer := BaseConfigurer{}
 	solverConfigurer := logicNgSolver{BaseConfigurer: &baseConfigurer, satSolver: satSolver}
 	baseConfigurer.Configurer = &solverConfigurer
 	return &solverConfigurer
 }
 
-func (l *logicNgSolver) SetRelevantVariables(variables []spi.Variable) {
+func (l *logicNgSolver) SetRelevantVariables(variables []Variable) {
 	l.relevantVariables = make([]formula.Variable, len(variables))
 	formulaFactory := l.satSolver.Factory()
 	for i, variable := range variables {
@@ -32,30 +31,30 @@ func (l *logicNgSolver) SetRelevantVariables(variables []spi.Variable) {
 	}
 }
 
-func (l *logicNgSolver) AddClause(spiLiterals []spi.Literal) {
+func (l *logicNgSolver) AddClause(spiLiterals []Literal) {
 	literals := l.logicNgLitsFrom(spiLiterals)
 	clause := l.satSolver.Factory().Clause(literals...)
 	l.satSolver.Add(clause)
 }
 
-func (l *logicNgSolver) logicNgLitsFrom(spiLiterals []spi.Literal) []formula.Literal {
+func (l *logicNgSolver) logicNgLitsFrom(spiLiterals []Literal) []formula.Literal {
 	formulaFactory := l.satSolver.Factory()
 	literals := make([]formula.Literal, len(spiLiterals))
 	for i, spiLiteral := range spiLiterals {
-		spiVariable := spi.VariableFrom(spiLiteral)
+		spiVariable := VariableFrom(spiLiteral)
 		literals[i] = formulaFactory.Lit(spiVariable.String(), spiLiteral > 0)
 	}
 	return literals
 }
 
-func (l *logicNgSolver) AddExactlyOne(spiLiterals []spi.Literal) {
+func (l *logicNgSolver) AddExactlyOne(spiLiterals []Literal) {
 	literals := l.logicNgLitsFrom(spiLiterals)
 	clause := l.satSolver.Factory().PBC(formula.EQ, 1, literals, slices.Repeat([]int{1}, len(literals)))
 	l.satSolver.Add(clause)
 }
 
-func (l *logicNgSolver) Solutions() iter.Seq[spi.Model] {
-	return func(yield func(spi.Model) bool) {
+func (l *logicNgSolver) Solutions() iter.Seq[Model] {
+	return func(yield func(Model) bool) {
 		for {
 			result := l.satSolver.Call(sat.WithModel(l.relevantVariables))
 			if !result.OK() || !result.Sat() {

@@ -3,7 +3,6 @@ package crogo
 import (
 	. "crogo/internal/constraints"
 	. "crogo/internal/grid"
-	. "crogo/internal/solver"
 	. "crogo/internal/variables"
 	"crogo/pkg/solver"
 	"iter"
@@ -31,9 +30,7 @@ func NewCrossword(cells [][]rune, words []string) (*Crossword, error) {
 
 // Solve solves this crossword using builtin solver.
 func (c *Crossword) Solve() Solutions {
-	//defaultSolver := NewGiniSolver()
-	//defaultSolver := NewGophersatSolver()
-	defaultSolver := NewLogicNgSolver()
+	defaultSolver := solver.NewLogicNgSolver()
 	return c.SolveWith(defaultSolver)
 }
 

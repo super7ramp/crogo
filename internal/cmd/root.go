@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"crogo/internal/solver"
 	"crogo/pkg/crogo"
 	"crogo/pkg/dictionaries"
-	spi "crogo/pkg/solver"
+	"crogo/pkg/solver"
 	"errors"
 	"fmt"
 	"iter"
@@ -78,7 +77,7 @@ func crosswordFrom(crosswordArg string) (*crogo.Crossword, error) {
 	return crogo.NewCrossword(runes, dictionaries.Ukacd())
 }
 
-func solverFrom(solverName string) (spi.ConfigurableSolver, error) {
+func solverFrom(solverName string) (solver.ConfigurableSolver, error) {
 	switch solverName {
 	case "logicng":
 		return solver.NewLogicNgSolver(), nil

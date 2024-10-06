@@ -1,43 +1,42 @@
 package solver
 
 import (
-	spi "crogo/pkg/solver"
 	"github.com/go-air/gini"
 	"github.com/go-air/gini/z"
 	"iter"
 )
 
 type giniSolver struct {
-	*spi.BaseConfigurer
+	*BaseConfigurer
 	backend           *gini.Gini
 	relevantVariables []z.Var
 }
 
 // NewGiniSolver creates a new instance of a spi.ConfigurableSolver based on Gini.
-func NewGiniSolver() spi.ConfigurableSolver {
+func NewGiniSolver() ConfigurableSolver {
 	backend := gini.New()
-	baseConfigurer := spi.BaseConfigurer{}
+	baseConfigurer := BaseConfigurer{}
 	solverConfigurer := giniSolver{BaseConfigurer: &baseConfigurer, backend: backend}
 	baseConfigurer.Configurer = &solverConfigurer
 	return &solverConfigurer
 }
 
-func (g *giniSolver) AddClause(spiLiterals []spi.Literal) {
+func (g *giniSolver) AddClause(spiLiterals []Literal) {
 	for _, spiLiteral := range spiLiterals {
 		g.backend.Add(z.Dimacs2Lit(int(spiLiteral)))
 	}
 	g.backend.Add(0)
 }
 
-func (g *giniSolver) SetRelevantVariables(variables []spi.Variable) {
+func (g *giniSolver) SetRelevantVariables(variables []Variable) {
 	g.relevantVariables = make([]z.Var, len(variables))
 	for i, variable := range variables {
 		g.relevantVariables[i] = z.Var(variable)
 	}
 }
 
-func (g *giniSolver) Solutions() iter.Seq[spi.Model] {
-	return func(yield func(spi.Model) bool) {
+func (g *giniSolver) Solutions() iter.Seq[Model] {
+	return func(yield func(Model) bool) {
 		for {
 			if res := g.backend.Solve(); res != 1 {
 				break
