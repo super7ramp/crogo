@@ -1,2 +1,6 @@
+# IntelliJ stuff
 .idea
 *.iml
+
+# cli binary
+crogo
