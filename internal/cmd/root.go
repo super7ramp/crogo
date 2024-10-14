@@ -74,7 +74,11 @@ func crosswordFrom(crosswordArg string) (*crogo.Crossword, error) {
 	for i, line := range lines {
 		runes[i] = []rune(line)
 	}
-	return crogo.NewCrossword(runes, dictionaries.Ukacd())
+	crossword, err := crogo.NewCrossword(runes, dictionaries.Ukacd())
+	if err != nil {
+		return nil, fmt.Errorf("invalid crossword: %w", err)
+	}
+	return crossword, nil
 }
 
 func solverFrom(solverName string) (solver.ConfigurableSolver, error) {
