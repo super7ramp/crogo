@@ -82,7 +82,7 @@ func (c *Constraints) AddOneWordPerSlotClausesTo(solverConfigurer solver.Configu
 func (c *Constraints) fillCellLiteralsConjunction(cellLiterals *[]solver.Literal, slot Slot, word string) {
 	slotPositions := slot.Positions()
 	wordRunes := []rune(word)
-	for i := 0; i < len(slotPositions); i++ {
+	for i := range len(slotPositions) {
 		letterIndex, found := alphabet.IndexOf(wordRunes[i])
 		if !found {
 			panic("Unsupported character " + string(wordRunes[i]))

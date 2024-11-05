@@ -95,10 +95,10 @@ func solverFrom(solverName string) (solver.ConfigurableSolver, error) {
 func iterateAndPrint(solutions crogo.Solutions) {
 	getNextSolution, stop := iter.Pull(solutions)
 	defer stop()
-	for i := 1; i <= count; i++ {
+	for i := range count {
 		nextSolution, found := getNextSolution()
 		if !found {
-			if i == 1 {
+			if i == 0 {
 				fmt.Println("No solution found.")
 			} else {
 				fmt.Println("No more solution.")
