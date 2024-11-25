@@ -7,7 +7,7 @@ require (
 	github.com/crillab/gophersat v1.4.0
 	github.com/go-air/gini v1.0.4
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/text v0.20.0
 )
 
