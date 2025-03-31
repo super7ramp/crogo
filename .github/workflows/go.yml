@@ -19,12 +19,10 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.23'
+        go-version-file: 'go.mod'
 
     - name: Lint
-      run: |
-        go install github.com/tomarrell/wrapcheck/v2/cmd/wrapcheck@v2
-        wrapcheck ./...
+      run: go run github.com/tomarrell/wrapcheck/v2/cmd/wrapcheck@v2.11.0 ./...
 
     - name: Build
       run: go build -v ./...

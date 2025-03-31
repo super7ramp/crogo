@@ -1,6 +1,6 @@
 module crogo
 
-go 1.23
+go 1.24
 
 require (
 	github.com/booleworks/logicng-go v0.4.0
@@ -8,7 +8,7 @@ require (
 	github.com/go-air/gini v1.0.4
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/text v0.22.0
+	golang.org/x/text v0.23.0
 )
 
 require (
