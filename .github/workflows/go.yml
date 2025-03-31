@@ -22,7 +22,9 @@ jobs:
         go-version-file: 'go.mod'
 
     - name: Lint
-      run: go tool wrapcheck ./...
+      run: |
+        go install github.com/tomarrell/wrapcheck/v2/cmd/wrapcheck@v2
+        wrapcheck ./...
 
     - name: Build
       run: go build -v ./...
